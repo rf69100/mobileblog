@@ -24,36 +24,49 @@ No lint script is configured in `package.json`. TypeScript strict mode is enable
 
 ## Architecture
 
-This is an **Expo + React Native** app using **Expo Router** (file-based navigation, same conventions as Next.js App Router) targeting iOS, Android, and web.
+This is an **Expo + React Native** app using **Expo Router** (file-based, Stack navigation) targeting iOS, Android, and web. Styling is done exclusively with **NativeWind** (Tailwind CSS via `className` props — no StyleSheet usage).
 
-### Mixed codebase warning
+### Routes
 
-The `app/` directory contains two distinct sets of files:
+| File | Route |
+|---|---|
+| `app/index.tsx` | `/` — home, lists all billets |
+| `app/login.tsx` | `/login` |
+| `app/register.tsx` | `/register` |
+| `app/billets/[id].tsx` | `/billets/:id` — billet detail + comments |
 
-1. **Expo Router files** (active): `app/(tabs)/`, `app/modal.tsx`, `app/+not-found.tsx`, `app/+html.tsx`
-2. **Next.js-style files** (not wired up — `next` is absent from `package.json`): `app/page.tsx`, `app/billets/[id]/page.tsx`, `app/login/page.tsx`, `app/register/page.tsx`, `app/api/auth/*/route.ts`
+`app/_layout.tsx` is the Expo Router root layout: loads fonts, hides splash screen, wraps everything in `SafeAreaProvider`, and registers all Stack screens with `headerShown: false`.
 
-`app/_layout.tsx` currently contains a Next.js `BilletPage` component (imports `next/navigation`) instead of an Expo Router root layout — this breaks Expo Router's root layout and must be replaced before the app routes work correctly.
+### Screen / Component split
+
+Each route file is a thin screen wrapper (`SafeAreaView` + `Header`). All real UI and data-fetching logic lives in `components/`:
+
+- `Header` — nav bar, auth state (re-reads on every `pathname` change), login/logout buttons
+- `AllPosts` — fetches billet list, renders `BilletCard` items
+- `Post` — fetches billet detail (id from `useLocalSearchParams`) and its comments
+- `Login` / `Register` — form components
 
 ### Backend API
 
-The backend is a Laravel app using **Sanctum Bearer Token** auth, hosted at `https://www.ryanfonseca.fr/b2lp/api`. All endpoints and base URLs are centralised in `app/lib/api-config.ts`. The API returns the auth token as **raw plain text** (e.g. `"12|xyz..."`), not JSON — the Next.js proxy routes in `app/api/auth/` normalise this to `{ auth_token: "..." }`.
+Laravel app at `https://www.ryanfonseca.fr/b2lp/api` using **Sanctum Bearer Token** auth. All endpoint constants are in `app/lib/api-config.ts` (`API_BASE_URL`, `ENDPOINTS`).
+
+The login endpoint returns the token as **raw plain text** (e.g. `"12|xyz..."`), not JSON. `BilletService.login()` calls the Laravel API directly (no proxy needed — Bearer Token auth has no CSRF requirement on mobile).
 
 ### Key files
 
 | Path | Purpose |
 |---|---|
-| `app/lib/api-config.ts` | All API/proxy endpoint constants (`API_BASE_URL`, `ENDPOINTS`, `PROXY_ENDPOINTS`) |
-| `app/lib/auth.ts` | `TOKEN_KEY`, `isLoggedIn()`, `getAuthToken()` — reads from `localStorage` |
-| `app/services/billetService.ts` | `BilletService` static class — single place for all API calls; adds Bearer token automatically via internal `request()` helper |
+| `app/lib/api-config.ts` | `API_BASE_URL` and `ENDPOINTS` constants |
+| `app/lib/auth.ts` | `TOKEN_KEY`, `isLoggedIn()`, `getAuthToken()`, `setAuthToken()`, `removeAuthToken()` — all async, backed by `AsyncStorage` |
+| `app/lib/utils.ts` | `formatDate()` helper |
+| `app/services/billetService.ts` | `BilletService` static class — all API calls; internal `request()` helper injects `Bearer` token when `{ auth: true }` |
 | `app/types.ts` | Shared types: `Billet`, `BilletDetail`, `Commentaire`, `CurrentUser` |
-| `components/Themed.tsx` | `Text` and `View` wrappers that apply light/dark theme colors |
-| `constants/Colors.ts` | Light/dark palette |
+| `constants/theme.ts` | Named color palette (violet / slate / emerald / red) — use these when NativeWind class names aren't expressive enough |
 
 ### Auth flow
 
-Token is stored in `localStorage` under the key exported from `app/lib/auth.ts` (`TOKEN_KEY`). `BilletService.login()` calls the local Next.js proxy (`/api/auth/login`) rather than the Laravel API directly, to handle the CSRF handshake server-side. `BilletService.logout()` just removes the token from `localStorage`.
+Token is stored in `AsyncStorage` under `TOKEN_KEY` (exported from `app/lib/auth.ts`). `BilletService.login()` posts credentials, reads the raw-text token, and calls `setAuthToken()`. `BilletService.logout()` calls `removeAuthToken()` — no server round-trip.
 
 ### Path alias
 
-`@/` resolves to the repo root (configured in `tsconfig.json`), so `@/components/Themed` maps to `components/Themed.tsx`.
+`@/` resolves to the repo root (`tsconfig.json`), so `@/components/Header` maps to `components/Header.tsx`.
