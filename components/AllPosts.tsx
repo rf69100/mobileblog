@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { BilletService } from '@/app/services/billetService';
-import { formatDate } from '@/app/lib/utils';
-import type { Billet } from '@/app/types';
+import { BilletService } from '@/services/billetService';
+import { formatDate } from '@/lib/utils';
+import type { Billet } from '@/types';
 
 function BilletCard({ billet, index }: { billet: Billet; index: number }) {
   const router  = useRouter();

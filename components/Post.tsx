@@ -4,10 +4,10 @@ import {
   ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { BilletService } from '@/app/services/billetService';
-import { formatDate } from '@/app/lib/utils';
-import { isLoggedIn } from '@/app/lib/auth';
-import type { BilletDetail, Commentaire, CurrentUser } from '@/app/types';
+import { BilletService } from '@/services/billetService';
+import { formatDate } from '@/lib/utils';
+import { isLoggedIn } from '@/lib/auth';
+import type { BilletDetail, Commentaire, CurrentUser } from '@/types';
 
 function CommentaireItem({ commentaire }: { commentaire: Commentaire }) {
   const auteur   = commentaire.Auteur ?? 'Anonyme';
@@ -66,11 +66,9 @@ export default function Post() {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const today = new Date().toISOString().split('T')[0];
       await BilletService.postCommentaire({
-        contenu: newComment.trim(),
-        date: today,
-        billet_id: id,
+        COM_CONTENU: newComment.trim(),
+        billet_id: Number(id),
         user_id: currentUser.id,
       });
       setNewComment('');
@@ -161,7 +159,9 @@ export default function Post() {
                     multiline
                     numberOfLines={3}
                     textAlignVertical="top"
+                    maxLength={200}
                   />
+                  <Text className="text-xs text-slate-400 self-end">{newComment.length}/200</Text>
                   {submitError && (
                     <Text className="text-xs text-red-600">{submitError}</Text>
                   )}

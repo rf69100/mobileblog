@@ -4,7 +4,7 @@ import {
   ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { BilletService } from '@/app/services/billetService';
+import { BilletService } from '@/services/billetService';
 
 export default function Login() {
   const router = useRouter();

@@ -1,6 +1,6 @@
-import { API_BASE_URL, ENDPOINTS } from "@/app/lib/api-config";
-import { getAuthToken, setAuthToken, removeAuthToken } from "@/app/lib/auth";
-import type { Billet, BilletDetail, CurrentUser } from "@/app/types";
+import { API_BASE_URL, ENDPOINTS } from "@/lib/api-config";
+import { getAuthToken, setAuthToken, removeAuthToken } from "@/lib/auth";
+import type { Billet, BilletDetail, Commentaire, CurrentUser } from "@/types";
 
 export class BilletService {
 
@@ -42,25 +42,28 @@ export class BilletService {
 
   static async fetchBilletDetail(id: string): Promise<BilletDetail> {
     const res = await this.request(ENDPOINTS.billetDetail(id), { auth: true });
-    return res.json();
+    const json = await res.json();
+    return (json.data ?? json) as BilletDetail;
   }
 
   static async fetchCurrentUser(): Promise<CurrentUser> {
     const res = await this.request(ENDPOINTS.user, { auth: true });
-    return res.json();
+    const json = await res.json();
+    return (json.data ?? json) as CurrentUser;
   }
 
   static async postCommentaire(payload: {
-    contenu: string;
-    date: string;
-    billet_id: string | number;
+    COM_CONTENU: string;
+    billet_id: number;
     user_id: number;
-  }): Promise<void> {
-    await this.request(ENDPOINTS.commentaires, {
+  }): Promise<Commentaire> {
+    const res = await this.request(ENDPOINTS.commentaires, {
       method: "POST",
       auth: true,
       body: JSON.stringify(payload),
     });
+    const json = await res.json();
+    return (json.data ?? json) as Commentaire;
   }
 
   // Appel direct à l'API Laravel — pas de proxy CSRF nécessaire en mobile

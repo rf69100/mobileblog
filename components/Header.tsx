@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
-import { BilletService } from '@/app/services/billetService';
-import { isLoggedIn } from '@/app/lib/auth';
+import { BilletService } from '@/services/billetService';
+import { isLoggedIn } from '@/lib/auth';
 
 export default function Header() {
   const router   = useRouter();
