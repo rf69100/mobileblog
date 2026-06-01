@@ -63,7 +63,7 @@ export default function AllPosts() {
       <View className="mb-8">
         <View className="self-start flex-row items-center gap-1.5 bg-violet-100 rounded-full px-3 py-1 mb-4">
           <View className="w-1.5 h-1.5 rounded-full bg-violet-500" />
-          <Text className="text-xs font-bold text-violet-700">MonBlog</Text>
+          <Text className="text-xs font-bold text-violet-700">MobileBlog</Text>
         </View>
         <Text className="text-4xl font-extrabold text-slate-900 leading-tight">Derniers billets</Text>
         <Text className="mt-2 text-base text-slate-500">Retrouvez ici des articles publiés</Text>

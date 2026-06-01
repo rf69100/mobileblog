@@ -38,7 +38,7 @@ export default function Login() {
       >
         <View className="items-center mb-7">
           <View className="w-12 h-12 rounded-2xl bg-violet-600 items-center justify-center mb-3.5 shadow-lg">
-            <Text className="text-white text-lg font-extrabold">B2</Text>
+            <Text className="text-white text-lg font-extrabold tracking-tight">MB</Text>
           </View>
           <Text className="text-2xl font-extrabold text-slate-900">Bon retour !</Text>
           <Text className="mt-1 text-sm text-slate-500 text-center">

@@ -23,9 +23,9 @@ export default function Header() {
     <View className="flex-row items-center justify-between px-6 py-3.5 bg-white border-b border-violet-100">
       <Pressable className="flex-row items-center gap-2" onPress={() => router.push('/')}>
         <View className="w-8 h-8 rounded-lg bg-violet-600 items-center justify-center">
-          <Text className="text-white text-[8px] font-extrabold">B2LP</Text>
+          <Text className="text-white text-[10px] font-extrabold tracking-tight">MB</Text>
         </View>
-        <Text className="text-base font-bold text-slate-900">MonBlog</Text>
+        <Text className="text-base font-bold text-slate-900">MobileBlog</Text>
       </Pressable>
 
       <View className="flex-row items-center gap-2">
